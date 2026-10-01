@@ -36,18 +36,19 @@ int accept_client(int server_sockfd) {
 
 #define BUFSIZE 1024
 int echo(int client_sockfd) {
-	char buf[BUFSIZE] = { 0, };
+	char buf[BUFSIZE];
 	while (1) {
 		int recvlen = recv(client_sockfd, buf, BUFSIZE - 1, 0);
 		if (recvlen < 1) {
 			return recvlen;
 		}
-		buf[recvlen] = 0;
+		buf[recvlen] = '\0';
 		write(STDOUT_FILENO, buf, recvlen + 1);
 		int sendlen = send(client_sockfd, buf, recvlen + 1, 0);
 		if (sendlen < 0) {
 			return -1;
 		}
+		sleep(2);
 	}
 }
 
@@ -61,8 +62,13 @@ int main(void) {
 		return 1;
 	}
 	int client_sockfd = accept_client(server_sockfd);
+	if (client_sockfd < 0) {
+		return 1;
+	}
 	int ret = echo(client_sockfd);
+	sleep(5);
 	close(client_sockfd);
+	sleep(5);
 	close(server_sockfd);
 	return ret;
 }
